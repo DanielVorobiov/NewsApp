@@ -1,28 +1,39 @@
 
 import React , {useState, useEffect} from 'react';
-import { StyleSheet, Text, View, SafeAreaView, FlatList,ActivityIndicator, Linking, Image, TouchableOpacity} from 'react-native';
+import { RefreshControl, StyleSheet, Text, View, SafeAreaView, FlatList,ActivityIndicator, Linking, Image, TouchableOpacity} from 'react-native';
 
 
 const URL = 'http://newsapi.org/v2/top-headlines?' +
-'country=in&' +
+'country=us&' +
 'apiKey=d3617fc0504c41d0a430bebf6ba1ca63';
 
 export default function App(){
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [title,setTitle] = useState([]);
+  const [refreshing, setRefreshing] = useState(true);
 
-  useEffect(() => { 
+useEffect(()=>{
+  getData();
+},[]);
+
+const getData = () =>{ 
     fetch(URL).then((response) => response.json())
-    .then((json) => {setData(json.articles); setTitle(json.title)})
+    .then((json) => {setRefreshing(false);setData(json.articles); setTitle(json.title);})
     .catch((error) => alert(error))
     .finally(() => setLoading(false));
-  },[]);
-  
+  };
+  const onRefresh = () => {
+    //Clear old data of the list
+    setData([]);
+    //Call the Service to get the latest data
+    getData();
+  };
 
 
   return (
     <SafeAreaView style={{paddingTop:50,paddingLeft:10, backgroundColor: '#c9f5f5',}}>
+      
       {isLoading ? <ActivityIndicator/>:
         <View> 
         <Text>{title}</Text>
@@ -37,14 +48,19 @@ export default function App(){
                 <Image  style={{width: 50, height: 50,}}  source={{uri: (item.urlToImage)}}></Image>
               </TouchableOpacity>
             </View>
-            <View style={{marginRight:10,width:340}}>
+            <View style={{marginRight:10,width:340, marginBottom:40}}>
               <Text key={0} style={{}}  >{item.title}</Text>
               <Text key={1} style={{color:'blue'}} onPress = {() => Linking.openURL(item.url)}>URL:  {item.url} {"\n"}</Text>
             </View>
           </View>
           );
-  
         }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }
         />
       </View>
       }
