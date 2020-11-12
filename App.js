@@ -24,9 +24,7 @@ const getData = () =>{
     .finally(() => setLoading(false));
   };
   const onRefresh = () => {
-    //Clear old data of the list
     setData([]);
-    //Call the Service to get the latest data
     getData();
   };
 
@@ -34,9 +32,8 @@ const getData = () =>{
   return (
     <SafeAreaView style={{paddingTop:50,paddingLeft:10, backgroundColor: '#c9f5f5',}}>
       
-      {isLoading ? <ActivityIndicator/>:
+      {isLoading ? <ActivityIndicator size='large' color='black' style={{paddingTop:100z}}/>:
         <View> 
-        <Text>{title}</Text>
         <FlatList 
         data = {data}
         keyExtractor={({id},index) => id}
